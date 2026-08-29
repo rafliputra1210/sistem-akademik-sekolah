@@ -12,6 +12,17 @@ use Illuminate\Support\Facades\DB;
 class TeacherController extends Controller
 {
     // Method untuk menyimpan data guru baru
+    public function index()
+    {
+        $teachers = Teacher::with('user')->get();
+        return view('admin.teachers.index', compact('teachers'));
+    }
+
+    public function create()
+    {
+        return view('admin.teachers.create');
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -31,7 +42,7 @@ class TeacherController extends Controller
                 'role' => 'guru',
             ]);
 
-            // 2. Simpan Data Profil Guru[cite: 1]
+            // 2. Simpan Data Profil Guru
             Teacher::create([
                 'user_id' => $user->id,
                 'nip' => $request->nip,
@@ -39,11 +50,11 @@ class TeacherController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->back()->with('success', 'Data Guru dan Akun Login berhasil dibuat!');
+            return redirect()->route('admin.teachers.index')->with('success', 'Data Guru dan Akun Login berhasil dibuat!');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }

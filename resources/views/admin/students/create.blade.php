@@ -1,44 +1,57 @@
-<!-- resources/views/admin/students/create.blade.php -->
-<h1>Tambah Data Siswa Baru</h1>
+@extends('layouts.admin')
+@section('header', 'Tambah Data Siswa')
 
-@if(session('success'))
-    <div style="color: green; margin-bottom: 15px;">{{ session('success') }}</div>
-@endif
+@section('content')
+<div class="max-w-xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-50 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-800">Formulir Pendaftaran Siswa</h3>
+            <p class="text-sm text-gray-500 mt-1">Masukkan data diri siswa dan tentukan penempatan kelasnya[cite: 1].</p>
+        </div>
+        
+        <form action="{{ route('admin.students.store') }}" method="POST" class="p-6">
+            @csrf
+            
+            <div class="mb-5">
+                <label for="nisn" class="block text-sm font-medium text-gray-700 mb-2">NISN <span class="text-red-500">*</span></label>
+                <input type="text" name="nisn" id="nisn" required placeholder="Masukkan Nomor Induk Siswa Nasional" 
+                    class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2.5 border text-sm">
+                @error('nisn')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
 
-@if($errors->any())
-    <div style="color: red; margin-bottom: 15px;">
-        <ul>
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+            <div class="mb-5">
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
+                <input type="text" name="name" id="name" required placeholder="Masukkan Nama Lengkap Siswa" 
+                    class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2.5 border text-sm">
+                @error('name')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
 
-<form action="{{ route('admin.students.store') }}" method="POST">
-    @csrf
-    
-    <div style="margin-bottom: 10px;">
-        <label>NISN Siswa:</label><br>
-        <input type="text" name="nisn" value="{{ old('nisn') }}" required>
-    </div>
-    
-    <div style="margin-bottom: 10px;">
-        <label>Nama Lengkap Siswa:</label><br>
-        <input type="text" name="name" value="{{ old('name') }}" required>
-    </div>
+            <div class="mb-6">
+                <label for="class_room_id" class="block text-sm font-medium text-gray-700 mb-2">Penempatan Kelas <span class="text-red-500">*</span></label>
+                <select name="class_room_id" id="class_room_id" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2.5 border text-sm bg-white">
+                    <option value="">-- Pilih Kelas --</option>
+                    @foreach($classes as $class)
+                        <option value="{{ $class->id }}">{{ $class->name }}</option>
+                    @endforeach
+                </select>
+                @error('class_room_id')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
 
-    <div style="margin-bottom: 10px;">
-        <label>Pilih Kelas:</label><br>
-        <select name="class_room_id" required>
-            <option value="">-- Pilih Kelas --</option>
-            @foreach($classes as $class)
-                <option value="{{ $class->id }}" {{ old('class_room_id') == $class->id ? 'selected' : '' }}>
-                    {{ $class->name }}
-                </option>
-            @endforeach
-        </select>
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-gray-100">
+                <a href="{{ route('admin.students.index') }}" class="px-5 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+                    Batal
+                </a>
+                <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow transition">
+                    Simpan Siswa
+                </button>
+            </div>
+        </form>
     </div>
-    
-    <button type="submit">Simpan Data Siswa</button>
-</form>
+</div>
+@endsection
