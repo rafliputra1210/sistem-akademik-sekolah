@@ -31,7 +31,13 @@ Route::middleware(['auth'])->get('/dashboard', function () {
 // ==========================================
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    
+    // Route Export & Import Guru
+    Route::post('teachers/import', [TeacherController::class, 'import'])->name('teachers.import');
+    Route::get('teachers/export', [TeacherController::class, 'export'])->name('teachers.export');
+
+    // Route Export & Import Siswa
+    Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
+    Route::get('students/export', [StudentController::class, 'export'])->name('students.export');
     // Route CRUD Data Master
     Route::resource('teachers', TeacherController::class);
     Route::resource('students', StudentController::class);

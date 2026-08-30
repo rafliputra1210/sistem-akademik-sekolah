@@ -8,9 +8,23 @@ use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\TeachersExport;
+use App\Imports\TeachersImport;
 
 class TeacherController extends Controller
 {
+    public function export()
+    {
+        return Excel::download(new TeachersExport, 'data_guru.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
+        Excel::import(new TeachersImport, $request->file('file'));
+        return redirect()->back()->with('success', 'Data Guru berhasil diimpor!');
+    }
     // Method untuk menyimpan data guru baru
     public function index()
     {
@@ -55,6 +69,58 @@ class TeacherController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function edit(Teacher $teacher)
+    {
+        return view('admin.teachers.edit', compact('teacher'));
+    }
+
+    public function update(Request $request, Teacher $teacher)
+    {
+        $request->validate([
+            'nip' => 'required|unique:teachers,nip,' . $teacher->id,
+            'name' => 'required|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            if ($teacher->user) {
+                $teacher->user->update([
+                    'name' => $request->name,
+                    'username' => $request->nip,
+                ]);
+            }
+
+            $teacher->update([
+                'nip' => $request->nip,
+                'name' => $request->name,
+            ]);
+
+            DB::commit();
+            return redirect()->route('admin.teachers.index')->with('success', 'Data Guru berhasil diperbarui!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function destroy(Teacher $teacher)
+    {
+        try {
+            DB::beginTransaction();
+            $user = $teacher->user;
+            $teacher->delete();
+            if ($user) {
+                $user->delete();
+            }
+            DB::commit();
+            return redirect()->route('admin.teachers.index')->with('success', 'Data Guru berhasil dihapus!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }

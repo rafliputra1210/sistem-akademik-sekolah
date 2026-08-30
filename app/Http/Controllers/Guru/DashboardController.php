@@ -21,13 +21,16 @@ class DashboardController extends Controller
         ];
         $today = $days[Carbon::now()->format('l')];
 
-        // Query jadwal berdasarkan ID guru dan hari ini
-        $schedules = Schedule::with(['classRoom', 'subject'])
-            ->where('teacher_id', $teacher->id)
-            ->where('day', $today)
-            ->orderBy('start_time')
-            ->get();
+        // Query jadwal berdasarkan ID guru dan hari ini jika profil guru ada
+        $schedules = collect();
+        if ($teacher) {
+            $schedules = Schedule::with(['classRoom', 'subject'])
+                ->where('teacher_id', $teacher->id)
+                ->where('day', $today)
+                ->orderBy('start_time')
+                ->get();
+        }
 
-        return view('guru.dashboard', compact('schedules', 'today'));
+        return view('guru.dashboard', compact('schedules', 'today', 'teacher'));
     }
 }

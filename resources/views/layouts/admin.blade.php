@@ -91,10 +91,10 @@
                 </button>
                 <!-- Profile -->
                 <div class="flex items-center border-l border-gray-100 pl-6 cursor-pointer">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=4f46e5&color=fff" alt="Avatar" class="w-9 h-9 rounded-full object-cover">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=4f46e5&color=fff" alt="Avatar" class="w-9 h-9 rounded-full object-cover">
                     <div class="ml-3 hidden md:block">
-                        <p class="text-sm font-semibold text-gray-700">Administrator</p>
-                        <p class="text-xs text-gray-500">Super Admin</p>
+                        <p class="text-sm font-semibold text-gray-700">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-indigo-600 font-medium">{{ strtoupper(auth()->user()->role) }}</p>
                     </div>
                 </div>
             </div>
@@ -102,7 +102,22 @@
         
         <!-- Scrollable Page Content -->
         <div class="flex-1 overflow-y-auto p-8">
-            <div class="max-w-7xl mx-auto">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <!-- Alert Feedback -->
+                @if(session('success'))
+                    <div class="flex items-center p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl shadow-sm">
+                        <svg class="w-5 h-5 mr-3 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span class="text-sm font-medium">{{ session('success') }}</span>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="flex items-center p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl shadow-sm">
+                        <svg class="w-5 h-5 mr-3 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="text-sm font-medium">{{ session('error') }}</span>
+                    </div>
+                @endif
+
                 @yield('content')
             </div>
         </div>
