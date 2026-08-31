@@ -21,4 +21,9 @@ class Teacher extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(TeacherAttendance::class);
+    }
 }

@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\ClassRoomController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Guru\DashboardController as GuruDashboardController;
 use App\Http\Controllers\Guru\AttendanceController;
+use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
+
 
 
 Route::get('/', function () {
@@ -44,6 +46,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('schedules', ScheduleController::class);
     Route::resource('classes', ClassRoomController::class);
     Route::resource('subjects', SubjectController::class);
+    Route::get('/attendances', [AdminAttendanceController::class, 'index'])->name('attendances.index');
 });
 
 // ==========================================
@@ -54,10 +57,13 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(f
     // Dashboard Jadwal Mengajar
     Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
     
+    // Absensi Mandiri Guru (Kamera)
+    Route::get('/attendance-camera', [AttendanceController::class, 'camera'])->name('attendance.camera');
+    Route::post('/attendance-camera', [AttendanceController::class, 'storeCamera'])->name('attendance.store_camera');
+
     // Input Absensi Siswa
     Route::get('/attendance/{schedule}', [AttendanceController::class, 'create'])->name('attendance.create');
     Route::post('/attendance/{schedule}', [AttendanceController::class, 'store'])->name('attendance.store');
-    
 });
 
 
