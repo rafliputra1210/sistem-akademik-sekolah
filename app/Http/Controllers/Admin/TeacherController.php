@@ -40,8 +40,9 @@ class TeacherController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nip' => 'required|unique:teachers,nip',
-            'name' => 'required|string|max:255',
+            'nip'     => 'required|unique:teachers,nip',
+            'name'    => 'required|string|max:255',
+            'jabatan' => 'nullable|string|max:255',
         ]);
 
         try {
@@ -50,17 +51,18 @@ class TeacherController extends Controller
             // 1. Generate Akun User untuk Guru
             // Menggunakan NIP sebagai username default, dan 'password123' sebagai password awal
             $user = User::create([
-                'name' => $request->name,
+                'name'     => $request->name,
                 'username' => $request->nip, 
                 'password' => Hash::make('password123'), 
-                'role' => 'guru',
+                'role'     => 'guru',
             ]);
 
             // 2. Simpan Data Profil Guru
             Teacher::create([
                 'user_id' => $user->id,
-                'nip' => $request->nip,
-                'name' => $request->name,
+                'nip'     => $request->nip,
+                'name'    => $request->name,
+                'jabatan' => $request->jabatan,
             ]);
 
             DB::commit();
@@ -80,8 +82,9 @@ class TeacherController extends Controller
     public function update(Request $request, Teacher $teacher)
     {
         $request->validate([
-            'nip' => 'required|unique:teachers,nip,' . $teacher->id,
-            'name' => 'required|string|max:255',
+            'nip'     => 'required|unique:teachers,nip,' . $teacher->id,
+            'name'    => 'required|string|max:255',
+            'jabatan' => 'nullable|string|max:255',
         ]);
 
         try {
@@ -89,14 +92,15 @@ class TeacherController extends Controller
 
             if ($teacher->user) {
                 $teacher->user->update([
-                    'name' => $request->name,
+                    'name'     => $request->name,
                     'username' => $request->nip,
                 ]);
             }
 
             $teacher->update([
-                'nip' => $request->nip,
-                'name' => $request->name,
+                'nip'     => $request->nip,
+                'name'    => $request->name,
+                'jabatan' => $request->jabatan,
             ]);
 
             DB::commit();

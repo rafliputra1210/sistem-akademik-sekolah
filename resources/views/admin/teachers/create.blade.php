@@ -20,7 +20,12 @@
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
-
+            <div class="mb-6">
+                <label for="jabatan" class="block text-sm font-medium text-gray-700 mb-2">Jabatan / Posisi</label>
+                <input type="text" name="jabatan" id="jabatan" placeholder="Contoh: Wali Kelas 10, Guru Mapel, dsb" 
+                    class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2.5 border text-sm">
+                <p class="text-xs text-gray-500 mt-1">Opsional, bisa dikosongkan.</p>
+            </div>
             <div class="mb-6">
                 <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
                 <input type="text" name="name" id="name" required placeholder="Masukkan Nama Lengkap Guru" 

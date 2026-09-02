@@ -46,6 +46,7 @@
             <tr class="bg-gray-100 text-gray-700 text-sm">
                 <th class="p-4 border-b">NIP / Username</th>
                 <th class="p-4 border-b">Nama Lengkap</th>
+                <th class="p-4 border-b text-center w-40">Jabatan</th>
                 <th class="p-4 border-b text-center w-40">Aksi</th>
             </tr>
         </thead>
@@ -53,7 +54,12 @@
             @forelse($teachers as $teacher)
             <tr class="border-b hover:bg-blue-50 transition">
                 <td class="p-4 font-medium">{{ $teacher->nip }}</td>
-                <td class="p-4">{{ $teacher->name }}</td>
+                <td class="p-4 font-semibold text-gray-900">{{ $teacher->name }}</td>
+                <td class="p-4 text-center">
+                    <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
+                        {{ $teacher->jabatan ?? 'Guru Umum' }}
+                    </span>
+                </td>
                 <td class="p-4 text-center">
                     <div class="flex items-center justify-center space-x-2">
                         <a href="{{ route('admin.teachers.edit', $teacher->id) }}" class="text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded transition">
@@ -71,7 +77,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="3" class="p-8 text-center text-gray-400">Belum ada data guru yang didaftarkan.</td>
+                <td colspan="4" class="p-8 text-center text-gray-400">Belum ada data guru yang didaftarkan.</td>
             </tr>
             @endforelse
         </tbody>

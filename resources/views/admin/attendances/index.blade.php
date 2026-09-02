@@ -49,7 +49,7 @@
             <tbody class="text-sm text-gray-700">
                 @forelse($attendances as $index => $absen)
                 <tr class="border-b hover:bg-blue-50 transition">
-                    <td class="p-4 text-center">{{ $index + 1 }}</td>
+                    <td class="p-4 text-center text-gray-500">{{ ($attendances->firstItem() ?? 1) + $index }}</td>
                     <td class="p-4 font-bold text-gray-900">{{ $absen->student->name }}</td>
                     <td class="p-4">{{ $absen->student->classRoom->name }}</td>
                     <td class="p-4">{{ $absen->schedule->subject->name }}</td>
@@ -76,5 +76,11 @@
             </tbody>
         </table>
     </div>
+
+    @if($attendances->hasPages())
+    <div class="p-4 border-t border-gray-100 bg-gray-50/50">
+        {{ $attendances->links() }}
+    </div>
+    @endif
 </div>
 @endsection
