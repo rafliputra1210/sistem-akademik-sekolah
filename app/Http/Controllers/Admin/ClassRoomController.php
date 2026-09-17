@@ -26,8 +26,43 @@ public function create()
 }
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required|string|unique:class_rooms,name']);
+        $request->validate(['name' => 'required|string|max:255|unique:class_rooms,name']);
         ClassRoom::create($request->all());
-        return redirect()->back()->with('success', 'Data Kelas berhasil ditambahkan!');
+        return redirect()->route('admin.classes.index')->with('success', 'Data Kelas berhasil ditambahkan!');
+    }
+
+    public function edit($id)
+    {
+        $classRoom = ClassRoom::findOrFail($id);
+        return view('admin.classes.edit', compact('classRoom'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:class_rooms,name,' . $id,
+        ], [
+            'name.unique' => 'Nama kelas ini sudah digunakan.'
+        ]);
+
+        $classRoom = ClassRoom::findOrFail($id);
+        $classRoom->update([
+            'name' => $request->name,
+        ]);
+
+        return redirect()->route('admin.classes.index')->with('success', 'Data Kelas berhasil diperbarui!');
+    }
+
+    public function destroy($id)
+    {
+        $classRoom = ClassRoom::findOrFail($id);
+
+        if ($classRoom->students()->count() > 0) {
+            return redirect()->route('admin.classes.index')->with('error', 'Tidak dapat menghapus kelas karena masih ada siswa di kelas ini!');
+        }
+
+        $classRoom->delete();
+
+        return redirect()->route('admin.classes.index')->with('success', 'Data Kelas berhasil dihapus!');
     }
 }

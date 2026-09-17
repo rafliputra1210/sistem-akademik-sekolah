@@ -15,6 +15,12 @@
     </div>
 @endif
 
+@if(session('error'))
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-sm">
+        {{ session('error') }}
+    </div>
+@endif
+
 <!-- Card Ringkasan Kelas -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
@@ -73,8 +79,12 @@
                     </td>
                     <td class="p-4 text-center space-x-2">
                         <!-- Placeholder untuk tombol Edit/Hapus -->
-                        <button class="text-blue-500 hover:text-blue-700 font-medium text-xs">Edit</button>
-                        <button class="text-red-500 hover:text-red-700 font-medium text-xs">Hapus</button>
+                        <a href="{{ route('admin.classes.edit', $kelas->id) }}" class="inline-block text-blue-500 hover:text-blue-700 font-medium text-xs bg-blue-50 px-3 py-1.5 rounded hover:bg-blue-100 transition">Edit</a>
+                        <form action="{{ route('admin.classes.destroy', $kelas->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kelas {{ $kelas->name }}?')" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="inline-block text-red-500 hover:text-red-700 font-medium text-xs bg-red-50 px-3 py-1.5 rounded hover:bg-red-100 transition">Hapus</button>
+                        </form>
                     </td>
                 </tr>
                 @empty
