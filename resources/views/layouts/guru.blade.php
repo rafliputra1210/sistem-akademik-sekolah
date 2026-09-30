@@ -49,6 +49,16 @@
                 </svg>
                 Absensi Guru (Kamera)
             </a>
+
+            <a href="{{ route('guru.attendance.index') }}" class="flex items-center px-3 py-2.5 rounded-lg {{ (request()->routeIs('guru.attendance.index') || request()->routeIs('guru.attendance.create')) ? 'bg-emerald-50 text-emerald-700 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} transition-colors relative group">
+                @if(request()->routeIs('guru.attendance.index') || request()->routeIs('guru.attendance.create'))
+                    <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-emerald-600 rounded-r-md"></span>
+                @endif
+                <svg class="w-5 h-5 mr-3 {{ (request()->routeIs('guru.attendance.index') || request()->routeIs('guru.attendance.create')) ? 'text-emerald-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
+                Absensi Siswa
+            </a>
         </nav>
         
         <!-- Info Akun Singkat & Tombol Logout di Sidebar Bawah -->

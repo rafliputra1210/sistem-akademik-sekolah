@@ -110,7 +110,51 @@ class AttendanceController extends Controller
         return redirect()->route('guru.dashboard')->with('success', $msg);
     }
 
-    // Menampilkan form absensi dan daftar siswa
+    // Menampilkan daftar jadwal pelajaran guru untuk input/monitoring absensi siswa
+    public function index(Request $request)
+    {
+        $teacher = auth()->user()->teacher;
+        if (!$teacher) {
+            return redirect()->route('guru.dashboard')->with('error', 'Profil guru tidak ditemukan.');
+        }
+
+        $daysMap = [
+            'Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 
+            'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'
+        ];
+        $todayName = $daysMap[Carbon::now()->format('l')] ?? 'Senin';
+        $todayDate = Carbon::today()->format('Y-m-d');
+
+        // Filter hari (default hari ini, atau 'all' untuk semua hari)
+        $selectedDay = $request->get('day', $todayName);
+
+        $schedulesQuery = Schedule::with(['classRoom.students', 'subject'])
+            ->where('teacher_id', $teacher->id);
+
+        if ($selectedDay !== 'all') {
+            $schedulesQuery->where('day', $selectedDay);
+        }
+
+        $schedules = $schedulesQuery
+            ->orderByRaw("FIELD(day, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu')")
+            ->orderBy('start_time')
+            ->get();
+
+        // Cek ID jadwal yang sudah diabsen pada tanggal hari ini
+        $attendedScheduleIds = Attendance::whereIn('schedule_id', $schedules->pluck('id'))
+            ->whereDate('date', $todayDate)
+            ->distinct()
+            ->pluck('schedule_id')
+            ->toArray();
+
+        $allDays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
+        return view('guru.attendance.index', compact(
+            'schedules', 'selectedDay', 'todayName', 'todayDate', 'allDays', 'attendedScheduleIds'
+        ));
+    }
+
+    // Menampilkan form absensi dan daftar siswa berdasarkan jadwal pelajaran
     public function create(Schedule $schedule)
     {
         $teacher = auth()->user()->teacher;
@@ -120,14 +164,16 @@ class AttendanceController extends Controller
         }
 
         $today = Carbon::today()->format('Y-m-d');
-        $students = $schedule->classRoom->students;
+        $students = $schedule->classRoom->students()->orderBy('name', 'asc')->get();
 
         // Cek apakah guru sudah melakukan absensi untuk jadwal ini pada hari ini
-        $isAttendanceDone = Attendance::where('schedule_id', $schedule->id)
-            ->where('date', $today)
-            ->exists();
+        $existingAttendance = Attendance::where('schedule_id', $schedule->id)
+            ->whereDate('date', $today)
+            ->pluck('status', 'student_id');
 
-        return view('guru.attendance.create', compact('schedule', 'students', 'today', 'isAttendanceDone'));
+        $isAttendanceDone = $existingAttendance->isNotEmpty();
+
+        return view('guru.attendance.create', compact('schedule', 'students', 'today', 'isAttendanceDone', 'existingAttendance'));
     }
 
     // Menyimpan data absensi ke database (Optimasi Batch Upsert & Keamanan Otorisasi)
@@ -177,6 +223,6 @@ class AttendanceController extends Controller
             );
         });
 
-        return redirect()->route('guru.dashboard')->with('success', 'Data absensi kelas berhasil disimpan!');
+        return redirect()->route('guru.attendance.index')->with('success', "Absensi siswa Kelas {$schedule->classRoom->name} ({$schedule->subject->name}) berhasil disimpan!");
     }
 }

@@ -79,7 +79,14 @@
                     <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-indigo-600 rounded-r-md"></span>
                 @endif
                 <svg class="w-5 h-5 mr-3 {{ request()->routeIs('admin.attendances.*') ? 'text-indigo-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                Rekap Absensi
+                Rekap Absensi Siswa
+            </a>
+            <a href="{{ route('admin.teacher-attendances.index') }}" class="flex items-center px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.teacher-attendances.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium' }} transition-colors relative group">
+                @if(request()->routeIs('admin.teacher-attendances.*'))
+                    <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-indigo-600 rounded-r-md"></span>
+                @endif
+                <svg class="w-5 h-5 mr-3 {{ request()->routeIs('admin.teacher-attendances.*') ? 'text-indigo-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Rekap Absensi Guru
             </a>
         </nav>
         

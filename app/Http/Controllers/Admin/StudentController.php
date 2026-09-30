@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\ClassRoom;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentsExport;
 use App\Imports\StudentsImport;
@@ -55,7 +56,7 @@ class StudentController extends Controller
     public function update(Request $request, Student $student)
     {
         $request->validate([
-            'nisn' => 'required|unique:students,nisn,' . $student->id,
+            'nisn' => ['required', 'string', 'max:50', Rule::unique('students', 'nisn')->ignore($student->id)],
             'name' => 'required|string|max:255',
             'class_room_id' => 'required|exists:class_rooms,id',
         ]);
@@ -82,7 +83,7 @@ class StudentController extends Controller
 
     public function import(Request $request) 
     {
-        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv|max:5120']);
         Excel::import(new StudentsImport, $request->file('file'));
         return redirect()->back()->with('success', 'Data Siswa berhasil diimpor!');
     }

@@ -31,6 +31,16 @@ class DashboardController extends Controller
                 ->get();
         }
 
-        return view('guru.dashboard', compact('schedules', 'today', 'teacher'));
+        $attendedScheduleIds = [];
+        if ($teacher && $schedules->isNotEmpty()) {
+            $todayDate = Carbon::today()->format('Y-m-d');
+            $attendedScheduleIds = \App\Models\Attendance::whereIn('schedule_id', $schedules->pluck('id'))
+                ->whereDate('date', $todayDate)
+                ->distinct()
+                ->pluck('schedule_id')
+                ->toArray();
+        }
+
+        return view('guru.dashboard', compact('schedules', 'today', 'teacher', 'attendedScheduleIds'));
     }
 }

@@ -8,6 +8,8 @@ use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TeachersExport;
 use App\Imports\TeachersImport;
@@ -21,7 +23,7 @@ class TeacherController extends Controller
 
     public function import(Request $request)
     {
-        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv|max:5120']);
         Excel::import(new TeachersImport, $request->file('file'));
         return redirect()->back()->with('success', 'Data Guru berhasil diimpor!');
     }
@@ -40,7 +42,7 @@ class TeacherController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nip'     => 'required|unique:teachers,nip',
+            'nip'     => 'required|string|max:50|unique:teachers,nip',
             'name'    => 'required|string|max:255',
             'jabatan' => 'nullable|string|max:255',
         ]);
@@ -70,7 +72,8 @@ class TeacherController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            Log::error('Gagal membuat data guru: ' . $e->getMessage(), ['exception' => $e]);
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan sistem saat menyimpan data guru. Silakan coba kembali.');
         }
     }
 
@@ -82,7 +85,7 @@ class TeacherController extends Controller
     public function update(Request $request, Teacher $teacher)
     {
         $request->validate([
-            'nip'     => 'required|unique:teachers,nip,' . $teacher->id,
+            'nip'     => ['required', 'string', 'max:50', Rule::unique('teachers', 'nip')->ignore($teacher->id)],
             'name'    => 'required|string|max:255',
             'jabatan' => 'nullable|string|max:255',
         ]);
@@ -107,7 +110,8 @@ class TeacherController extends Controller
             return redirect()->route('admin.teachers.index')->with('success', 'Data Guru berhasil diperbarui!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            Log::error('Gagal memperbarui data guru ID ' . $teacher->id . ': ' . $e->getMessage(), ['exception' => $e]);
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan sistem saat memperbarui data guru.');
         }
     }
 
@@ -124,7 +128,8 @@ class TeacherController extends Controller
             return redirect()->route('admin.teachers.index')->with('success', 'Data Guru berhasil dihapus!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            Log::error('Gagal menghapus data guru ID ' . $teacher->id . ': ' . $e->getMessage(), ['exception' => $e]);
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus data guru.');
         }
     }
 }
